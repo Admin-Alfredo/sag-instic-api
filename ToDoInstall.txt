@@ -1,0 +1,25 @@
++express
++multpart
++node/ts - 
++prisma
++mysql2
+
+*enable package.josn
+
+ + type: module
+ + build: tsc
+{
+"compilerOptions":{
+  "module": "NodeNext",
+  "moduleResolution: "NodeNext",
+  "target": "ES2020",
+  "sourceMap": true,
+  "outDir": "dist"
+ },
+ "include": ["src/**/*"],
+}
+*install
+ + npm i -D typescript ts-node nodemon 
+ + npm i -D "types/node
+
+
