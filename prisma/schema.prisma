@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model admin {
+  id         Int              @id @default(autoincrement())
+  permissoes admin_permissoes @default(READ)
+  perfil_id  Int              @unique(map: "Admin_perfil_id_key")
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime
+  perfil     perfil           @relation(fields: [perfil_id], references: [id], map: "Admin_perfil_id_fkey")
+}
+
+model alunos {
+  id               Int      @id @default(autoincrement())
+  rank             Int      @default(0)
+  total_tarefas    Int      @default(0)
+  tarefas_completa Int      @default(0)
+  perfil_id        Int      @unique(map: "Alunos_perfil_id_key")
+  turma_id         Int
+  codigo_processo  Int?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @default(now())
+  perfil           perfil   @relation(fields: [perfil_id], references: [id], map: "Alunos_perfil_id_fkey")
+  turmas           turmas   @relation(fields: [turma_id], references: [id], map: "Alunos_turma_id_fkey")
+
+  @@index([turma_id], map: "Alunos_turma_id_fkey")
+}
+
+model cursos {
+  id             Int      @id @default(autoincrement())
+  descricao      String
+  quantidade_ano Int      @default(5)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now())
+  turmas         turmas[]
+}
+
+model perfil {
+  id          Int          @id @default(autoincrement())
+  nome        String       @db.VarChar(192)
+  email       String       @unique(map: "Perfil_email_key")
+  password    String?
+  role        perfil_role  @default(ALUNO)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now())
+  status      Int          @default(0)
+  admin       admin?
+  alunos      alunos?
+  professores professores?
+}
+
+model professores {
+  id           Int      @id @default(autoincrement())
+  departamento String?
+  perfil_id    Int      @unique(map: "Professores_perfil_id_key")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+  perfil       perfil   @relation(fields: [perfil_id], references: [id], map: "Professores_perfil_id_fkey")
+}
+
+model turmas {
+  id        Int      @id @default(autoincrement())
+  descricao String
+  curso_id  Int
+  ano       Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  alunos    alunos[]
+  cursos    cursos   @relation(fields: [curso_id], references: [id], map: "Turmas_curso_id_fkey")
+
+  @@index([curso_id], map: "Turmas_curso_id_fkey")
+}
+
+enum admin_permissoes {
+  FULL
+  READ
+  WRITE
+  READ_AND_WRITE
+}
+
+enum perfil_role {
+  ALUNO
+  PROFESSOR
+  ADMIN
+}
