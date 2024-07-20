@@ -2,7 +2,7 @@ import { Request, Response,  NextFunction } from "express";
 import { TokenExpiredError } from "jsonwebtoken";
 import { defaultPerfil, jwtVerify } from "../util.js";
 import { AuthRequest, TAuthLogin } from "../types.js";
-import { Perfil, Prisma, PrismaClient } from "@prisma/client";
+import {  Prisma, PrismaClient } from "@prisma/client";
 
 const prisma: PrismaClient = new PrismaClient()
 

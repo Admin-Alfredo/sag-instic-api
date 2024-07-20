@@ -7,16 +7,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model admin {
+model Admin {
   id         Int              @id @default(autoincrement())
   permissoes admin_permissoes @default(READ)
   perfil_id  Int              @unique(map: "Admin_perfil_id_key")
   createdAt  DateTime         @default(now())
   updatedAt  DateTime
-  perfil     perfil           @relation(fields: [perfil_id], references: [id], map: "Admin_perfil_id_fkey")
+  perfil     Perfil           @relation(fields: [perfil_id], references: [id], map: "Admin_perfil_id_fkey")
 }
 
-model alunos {
+model Alunos {
   id               Int      @id @default(autoincrement())
   rank             Int      @default(0)
   total_tarefas    Int      @default(0)
@@ -26,22 +26,22 @@ model alunos {
   codigo_processo  Int?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @default(now())
-  perfil           perfil   @relation(fields: [perfil_id], references: [id], map: "Alunos_perfil_id_fkey")
-  turmas           turmas   @relation(fields: [turma_id], references: [id], map: "Alunos_turma_id_fkey")
+  perfil           Perfil   @relation(fields: [perfil_id], references: [id], map: "Alunos_perfil_id_fkey")
+  turmas           Turmas   @relation(fields: [turma_id], references: [id], map: "Alunos_turma_id_fkey")
 
   @@index([turma_id], map: "Alunos_turma_id_fkey")
 }
 
 model cursos {
   id             Int      @id @default(autoincrement())
-  descricao      String
+  descricao      String   @unique
   quantidade_ano Int      @default(5)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @default(now())
-  turmas         turmas[]
+  turmas         Turmas[]
 }
 
-model perfil {
+model Perfil {
   id          Int          @id @default(autoincrement())
   nome        String       @db.VarChar(192)
   email       String       @unique(map: "Perfil_email_key")
@@ -50,28 +50,28 @@ model perfil {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @default(now())
   status      Int          @default(0)
-  admin       admin?
-  alunos      alunos?
-  professores professores?
+  admin       Admin?
+  alunos      Alunos?
+  professores Professores?
 }
 
-model professores {
+model Professores {
   id           Int      @id @default(autoincrement())
   departamento String?
   perfil_id    Int      @unique(map: "Professores_perfil_id_key")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now())
-  perfil       perfil   @relation(fields: [perfil_id], references: [id], map: "Professores_perfil_id_fkey")
+  perfil       Perfil   @relation(fields: [perfil_id], references: [id], map: "Professores_perfil_id_fkey")
 }
 
-model turmas {
+model Turmas {
   id        Int      @id @default(autoincrement())
   descricao String
   curso_id  Int
   ano       Int
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
-  alunos    alunos[]
+  alunos    Alunos[]
   cursos    cursos   @relation(fields: [curso_id], references: [id], map: "Turmas_curso_id_fkey")
 
   @@index([curso_id], map: "Turmas_curso_id_fkey")
