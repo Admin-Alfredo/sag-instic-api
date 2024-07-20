@@ -19,7 +19,7 @@ export const jwtVerify = (token: string): string | jwt.JwtPayload => {
     return jwt.verify(token, process.env.SECRET_KEY!)
 }
 
-export const defaultBodyLogin = {
+export const defaultResponse = {
     reset: false,
     redirect_link: null,
     data: { token: null },

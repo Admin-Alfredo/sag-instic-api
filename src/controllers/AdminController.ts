@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { AuthRequest } from "../types.js";
-import { compareBcryptHash, defaultBodyLogin, getBcryptHash } from "../util.js";
+import { compareBcryptHash, defaultResponse, getBcryptHash } from "../util.js";
 import { PrismaClient } from "@prisma/client";
 const prisma: PrismaClient = new PrismaClient()
 export default class {

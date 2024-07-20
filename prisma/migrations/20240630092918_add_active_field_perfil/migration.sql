@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE `perfil` ADD COLUMN `active` INTEGER NOT NULL DEFAULT 0;

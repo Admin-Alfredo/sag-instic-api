@@ -1,34 +1,56 @@
 import { Request, Response } from "express";
 import PerfilRepository from "../repositories/PerfilRepository.js";
-import { compareBcryptHash, defaultResponse, getBaseFullURL, getBaseURL, getBcryptHash, jwtSign } from "../util.js";
+import { compareBcryptHash, defaultResponse, getBaseFullURL, getBcryptHash, jwtSign, roles } from "../util.js";
 import { PrismaClient } from "@prisma/client";
 import { AuthRequest } from "../types.js";
+import { create } from "domain";
 const prisma: PrismaClient = new PrismaClient()
 
 export default class {
 
-    public static async index(req: Request, res: Response) {
-        const { email, password } = req.body
-        console.log(email, password);
-        if (!email)
-            return res.status(401).json({ message: "Não Autorizado, email ou senha incorreta [0]" })
-        if (!password)
-            return res.status(401).json({ message: "Não Autorizado, email ou senha incorreta [1]" })
+    public static async store(req: Request, res: Response) {
 
-        const perfil = await PerfilRepository.getOne({ email })
+        /**
+         * @body 
+         * #nome,
+         * #email
+         * #password
+         * #codigo_processo
+         * #curso_id
+         * #turma_id
+         * #ano
+         * **/
 
-        if (!perfil)
-            return res.status(404).json({ message: "Não Autorizado, Perfil não encontrado!" })
+        const { nome, email, password, codigo_processo, curso_id, turma_id, ano } = req.body
 
-        if (!compareBcryptHash(password, perfil.password!)) {
-            return res.status(404).json({ message: "Não Autorizado, email ou senha incorreta [2]" })
-        }
-        const token = jwtSign(JSON.stringify({ email: perfil.email, id: perfil.id }))
 
-        if (perfil.role === 'ADMIN' && perfil.status == 0)
-            return res.status(300).json({ ...defaultResponse, reset: true, redirect_link: getBaseFullURL('/reset/password'), data: { token } })
+        const turma = await prisma.turmas.findUnique({ where: { id: turma_id } })
+        if (!turma)
+            return res.status(412).json({ message: "Oops! turma não existe." })
 
-        return res.status(200).json({ ...defaultResponse, data: { token } })
+        if (turma.curso_id == curso_id)
+            return res.status(412).json({ message: "Oops! O curso não é valido." })
+
+        if (turma.ano == ano)
+            return res.status(412).json({ message: "Oops!O a ano não é valido." })
+
+        const perfil = await prisma.perfil.create({
+            data: {
+                role: "ALUNO",
+                nome: nome,
+                email: email,
+                password: getBcryptHash(password),
+                
+            },
+        })
+        const aluno = prisma.alunos.create({
+            data: {
+                turma_id: turma.id,
+                perfil_id: perfil.id
+            },
+        })
+
+        return res.status(200).json({ ...defaultResponse })
     }
 
 

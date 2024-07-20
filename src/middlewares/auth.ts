@@ -45,5 +45,4 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
         return res.status(500).json({ message: e.message })
     }
 
-
 }; 

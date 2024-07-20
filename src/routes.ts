@@ -5,20 +5,26 @@ import { getBaseURL } from './util.js';
 import { authenticate } from './middlewares/auth.js';
 
 export default function (app: Application) {
-    const LoginRouter = Router()
+    const AuthRouter = Router()
     const AdminRouter = Router()
+    const AlunosRouter = Router()
+
+    // Rotas de login
+    AuthRouter.post('/login', LoginController.index)
+    AlunosRouter.post('/cadastrar')
+
+
+    AuthRouter.post('/reset/password', [authenticate], LoginController.reset);
 
     //Rotas de administrar  [ALUNO]
     AdminRouter.get('/alunos', [authenticate], AdminController.get);
 
 
-    // Rotas de login
-    LoginRouter.post('/', LoginController.index)
-
-
     //Rota Geral
-    app.post(getBaseURL('/reset/password'), [authenticate], LoginController.reset);
 
-    app.use(getBaseURL('/login'), LoginRouter)
+    app.use(getBaseURL('/'), AuthRouter)
     app.use(getBaseURL('/admin'), AdminRouter)
+    app.use(getBaseURL('/alunos'), AlunosRouter)
+    
+    
 }
