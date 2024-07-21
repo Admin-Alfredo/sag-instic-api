@@ -17,28 +17,44 @@ model Admin {
 }
 
 model Alunos {
-  id               Int      @id @default(autoincrement())
-  rank             Int      @default(0)
-  total_tarefas    Int      @default(0)
-  tarefas_completa Int      @default(0)
-  perfil_id        Int      @unique(map: "Alunos_perfil_id_key")
+  id               Int             @id @default(autoincrement())
+  rank             Int             @default(0)
+  total_tarefas    Int             @default(0)
+  tarefas_completa Int             @default(0)
+  perfil_id        Int             @unique(map: "Alunos_perfil_id_key")
   turma_id         Int
-  codigo_processo  Int?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @default(now())
-  perfil           Perfil   @relation(fields: [perfil_id], references: [id], map: "Alunos_perfil_id_fkey")
-  turmas           Turmas   @relation(fields: [turma_id], references: [id], map: "Alunos_turma_id_fkey")
+  codigo_processo  Int             @unique
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @default(now())
+  perfil           Perfil          @relation(fields: [perfil_id], references: [id], map: "Alunos_perfil_id_fkey")
+  turma           Turmas          @relation(fields: [turma_id], references: [id], map: "Alunos_turma_id_fkey")
+  notificacoes     Anotificacoes[]
 
   @@index([turma_id], map: "Alunos_turma_id_fkey")
 }
 
-model cursos {
+model Cursos {
   id             Int      @id @default(autoincrement())
   descricao      String   @unique
   quantidade_ano Int      @default(5)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @default(now())
   turmas         Turmas[]
+  cursos_displinas Cursos_Disciplinas[]
+}
+model Disciplinas {
+  id        Int    @id @default(autoincrement())
+  descricao String @unique
+  cursos_displinas Cursos_Disciplinas[]
+}
+model Cursos_Disciplinas {
+  curso Cursos @relation(fields: [curso_id], references: [id])
+  curso_id Int
+  disciplina Disciplinas @relation(fields: [disciplina_id], references: [id])
+  disciplina_id Int
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now())
+  @@id([disciplina_id, curso_id])
 }
 
 model Perfil {
@@ -72,9 +88,18 @@ model Turmas {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
   alunos    Alunos[]
-  cursos    cursos   @relation(fields: [curso_id], references: [id], map: "Turmas_curso_id_fkey")
+  curso    Cursos   @relation(fields: [curso_id], references: [id], map: "Turmas_curso_id_fkey")
 
   @@index([curso_id], map: "Turmas_curso_id_fkey")
+}
+
+model Anotificacoes {
+  id        Int    @id @default(autoincrement())
+  descricao String
+  tipo      String
+  status    Int    @default(0)
+  aluno_id  Int
+  aluno     Alunos @relation(fields: [aluno_id], references: [id])
 }
 
 enum admin_permissoes {
