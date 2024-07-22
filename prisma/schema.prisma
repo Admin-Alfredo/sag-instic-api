@@ -27,33 +27,36 @@ model Alunos {
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @default(now())
   perfil           Perfil          @relation(fields: [perfil_id], references: [id], map: "Alunos_perfil_id_fkey")
-  turma           Turmas          @relation(fields: [turma_id], references: [id], map: "Alunos_turma_id_fkey")
+  turma            Turmas          @relation(fields: [turma_id], references: [id], map: "Alunos_turma_id_fkey")
   notificacoes     Anotificacoes[]
 
   @@index([turma_id], map: "Alunos_turma_id_fkey")
 }
 
 model Cursos {
-  id             Int      @id @default(autoincrement())
-  descricao      String   @unique
-  quantidade_ano Int      @default(5)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @default(now())
-  turmas         Turmas[]
+  id               Int                  @id @default(autoincrement())
+  descricao        String               @unique
+  quantidade_ano   Int                  @default(5)
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @default(now())
+  turmas           Turmas[]
   cursos_displinas Cursos_Disciplinas[]
 }
+
 model Disciplinas {
-  id        Int    @id @default(autoincrement())
-  descricao String @unique
+  id               Int                  @id @default(autoincrement())
+  descricao        String               @unique
   cursos_displinas Cursos_Disciplinas[]
 }
+
 model Cursos_Disciplinas {
-  curso Cursos @relation(fields: [curso_id], references: [id])
-  curso_id Int
-  disciplina Disciplinas @relation(fields: [disciplina_id], references: [id])
+  curso         Cursos      @relation(fields: [curso_id], references: [id])
+  curso_id      Int
+  disciplina    Disciplinas @relation(fields: [disciplina_id], references: [id])
   disciplina_id Int
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @default(now())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @default(now())
+
   @@id([disciplina_id, curso_id])
 }
 
@@ -82,13 +85,13 @@ model Professores {
 
 model Turmas {
   id        Int      @id @default(autoincrement())
-  descricao String
+  descricao String   @db.Char(1)
   curso_id  Int
   ano       Int
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
   alunos    Alunos[]
-  curso    Cursos   @relation(fields: [curso_id], references: [id], map: "Turmas_curso_id_fkey")
+  curso     Cursos   @relation(fields: [curso_id], references: [id], map: "Turmas_curso_id_fkey")
 
   @@index([curso_id], map: "Turmas_curso_id_fkey")
 }

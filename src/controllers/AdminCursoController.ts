@@ -6,7 +6,6 @@ export default class {
     public static async store(req: Request, res: Response) {
         let cursos;
         try {
-            console.log(req.body)
             if (Array.isArray(req.body))
                 cursos = await prisma.cursos.createMany({ data: req.body })
             else

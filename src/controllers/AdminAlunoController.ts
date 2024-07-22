@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { clearParamsOnBody,  defaultResponse } from "../util.js";
+import { clearParamsOnBody, defaultResponse } from "../util.js";
 import { PrismaClient } from "@prisma/client";
 const prisma: PrismaClient = new PrismaClient()
 export default class {
@@ -37,7 +37,7 @@ export default class {
             return res.status(500).json({ ...defaultResponse, message: error.message })
         }
     }
-    public static async getCursoAluno(req: Request, res: Response)  {
+    public static async getCursoAluno(req: Request, res: Response) {
         try {
             const aluno = await prisma.alunos.findUnique({
                 where: { id: Number(req.params.id) },
@@ -55,6 +55,29 @@ export default class {
         } catch (error: Error | any) {
             return res.status(500).json({ ...defaultResponse, message: error.message })
         }
+    }
+    public static async validar(req: Request, res: Response) {
+        if(typeof req.query.s != 'string')
+
+
+            
+        console.log(typeof req.query.s);   return res.status(412).json({ message: `Erro ao pegar o dados de alunos` })
+        // try {
+        //     const aluno = await prisma.alunos.findUnique({
+        //         where: { id: Number(req.params.id) },
+        //     })
+        //     if (!aluno)
+        //         return res.status(412).json({ message: `Erro ao pegar o dados de alunos` })
+
+        //     const perfil = await prisma.perfil.update({
+        //         where: { id: Number(aluno.perfil_id) },
+        //         data: { status:  }
+        //     })
+        //     return res.status(200).json({ ...defaultResponse, data: { alunos: true  } })
+
+        // } catch (error: Error | any) {
+        //     return res.status(500).json({ ...defaultResponse, message: error.message })
+        // }
     }
 
 }       
