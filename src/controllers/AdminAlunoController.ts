@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { clearParamsOnBody, defaultResponse } from "../util.js";
 import { PrismaClient } from "@prisma/client";
+import emailServices from "../services/email.js";
 const prisma: PrismaClient = new PrismaClient()
 export default class {
     public static async getAllAlunos(req: Request, res: Response) {
@@ -31,6 +32,7 @@ export default class {
                 turma: { ...aluno.turma, curso }
             } : aluno
 
+
             return res.status(200).json({ ...defaultResponse, data })
 
         } catch (error: Error | any) {
@@ -57,27 +59,32 @@ export default class {
         }
     }
     public static async validar(req: Request, res: Response) {
-        if(typeof req.query.s != 'string')
+        try {
+            const aluno = await prisma.alunos.findUnique({
+                where: { id: Number(req.params.id) },
+            })
+            if (!aluno)
+                return res.status(412).json({ message: `Erro ao pegar o dados de alunos` })
 
+            const perfil = await prisma.perfil.update({
+                where: { id: Number(aluno.perfil_id) },
+                data: { status: 1 }
+            })
+            const transporter = await emailServices.createTransporter();
+            emailServices.options.setTo('admiro.znt@gmail.com')
 
-            
-        console.log(typeof req.query.s);   return res.status(412).json({ message: `Erro ao pegar o dados de alunos` })
-        // try {
-        //     const aluno = await prisma.alunos.findUnique({
-        //         where: { id: Number(req.params.id) },
-        //     })
-        //     if (!aluno)
-        //         return res.status(412).json({ message: `Erro ao pegar o dados de alunos` })
+            transporter.sendMail(emailServices.options, function (error, info) {
+                if (error) {
+                    console.log('Error', error);
+                } else {
+                    console.log('Email enviado: ', info);
+                }
+            });
+            return res.status(200).json({ ...defaultResponse, message: "Aluno validado com sucesso!" })
 
-        //     const perfil = await prisma.perfil.update({
-        //         where: { id: Number(aluno.perfil_id) },
-        //         data: { status:  }
-        //     })
-        //     return res.status(200).json({ ...defaultResponse, data: { alunos: true  } })
-
-        // } catch (error: Error | any) {
-        //     return res.status(500).json({ ...defaultResponse, message: error.message })
-        // }
+        } catch (error: Error | any) {
+            return res.status(500).json({ ...defaultResponse, message: error.message })
+        }
     }
 
 }       

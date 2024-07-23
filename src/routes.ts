@@ -2,7 +2,7 @@ import { Router, Application } from 'express'
 
 import LoginController from './controllers/LoginController.js';
 import { getBaseURL } from './util.js';
-import { authenticate } from './middlewares/auth.js';
+import { authenticate, isAdmin } from './middlewares/auth.js';
 import AlunoController from './controllers/AlunoController.js';
 import AdminAlunoController from './controllers/AdminAlunoController.js';
 import AdminCursoController from './controllers/AdminCursoController.js';
@@ -21,10 +21,10 @@ export default function (app: Application) {
     AuthRouter.post('/reset/password', [authenticate], LoginController.reset);
 
     //ROTAS DE ADMINISTRADOR
-    AdminRouter.get('/alunos', [authenticate], AdminAlunoController.getAllAlunos);
+    AdminRouter.get('/alunos', [authenticate, isAdmin], AdminAlunoController.getAllAlunos);
     AdminRouter.get('/alunos/:id', [authenticate], AdminAlunoController.getOneAluno);
     AdminRouter.get('/alunos/:id/curso', [authenticate], AdminAlunoController.getCursoAluno);
-    AdminRouter.get('/alunos/:id/abilitar', [authenticate], AdminAlunoController.validar)
+    AdminRouter.get('/alunos/:id/validar', [authenticate], AdminAlunoController.validar)
     
     /**CURSOS */
     AdminRouter.post('/cursos', [authenticate], AdminCursoController.store)

@@ -1,14 +1,14 @@
-import { Request, Response,  NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { TokenExpiredError } from "jsonwebtoken";
 import { defaultPerfil, jwtVerify } from "../util.js";
 import { AuthRequest, TAuthLogin } from "../types.js";
-import {  Prisma, PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 const prisma: PrismaClient = new PrismaClient()
 
 
 export const authenticate = async (req: AuthRequest, res: Response, next: NextFunction) => {
-    
+
     const formatedToken = req.header('Authorization')?.split(" ")
     if (!formatedToken)
         return res.status(401).json({ message: "Não Autorizado! [0]" })
@@ -31,9 +31,9 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
         if (!decodedToken)
             return res.status(401).json({ message: "Não Autorizado! [4]" })
 
-        let perfil = await prisma.perfil.findFirst({ where: { id: decodedToken.id }, select: { ...defaultPerfil, password: true } })
-       
-        if(!perfil)
+        let perfil = await prisma.perfil.findFirst({ where: { id: decodedToken.id }, select: { ...defaultPerfil, role: true } })
+
+        if (!perfil)
             return res.status(404).json({ message: "Não Autorizado! [5]" })
 
         //@ts-ignore
@@ -45,4 +45,10 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
         return res.status(500).json({ message: e.message })
     }
 
-}; 
+};
+export const isAdmin = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    console.log(req.perfil)
+    if (req.perfil?.role != "ADMIN")
+        return res.status(401).json({ message: "Não Autorizado, Pararealizar esta operação" })
+    next()
+}
